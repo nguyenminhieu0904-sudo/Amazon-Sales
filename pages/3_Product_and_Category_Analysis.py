@@ -130,20 +130,21 @@ def product_category_analysis_page():
     st.markdown("Products ranked by their rating count, which indicates their popularity among customers.")
 
     st.markdown("### Top 10 Products by Rating Count")
-    col_graph_2, col_data_2 = st.columns(2)
+    col_graph_2, col_data_2 = st.columns([3,1])
     popular_product = filtered_data.sort_values(by='rating_count', ascending=True).head(10)
     with col_graph_2:
         fig_popular = px.bar(popular_product, 
-                        y='product_name', x ='rating_count', orientation='h',  
+                        y='product_id', x ='rating_count', orientation='h',  
                         labels = {'rating_count':'Rating Count', 'product_name':'Product Name'}, 
                         color='rating_count', color_continuous_scale='Blues',
                         title = 'Top 10 Products by Rating Count',
-                        hover_data = ['main_category', 'discounted_price']
+                        hover_data = ['main_category', 'discounted_price'],
+                        
                         )
         st.plotly_chart(fig_popular, use_container_width=True)
     with col_data_2:
         st.markdown("### Top 10 Popular Products by Rating Count")
-        st.dataframe(filtered_data[['product_name','main_category','rating_count']])
+        st.dataframe(filtered_data[['product_name','main_category','rating_count']].head(10), hide_index = True)
     st.markdown("This bar chart display the top 10 products based on their rating count, providing insights into which products are most popular among customers. The accompanying table lists the product names, their main categories, and their respective rating counts for further analysis.")
 
     st.header('Common Keywords in Product Names')
@@ -155,7 +156,7 @@ def product_category_analysis_page():
         text = ' '.join(all_keywords)
         wordcloud = WordCloud(width=800, height=400, background_color='white', colormap='viridis', max_words=100).generate(text)
 
-        col_graph_3, col_data_3 = st.columns(2)
+        col_graph_3, col_data_3 = st.columns([3,1])
         with col_graph_3:
                 fig,ax = plt.subplots(figsize=(12, 6))
                 ax.imshow(wordcloud, interpolation='bilinear')
@@ -165,7 +166,7 @@ def product_category_analysis_page():
                 st.markdown("### Common Keywords in Product Names")
                 keyword_counts = pd.Series(all_keywords).value_counts().head(10).reset_index()
                 keyword_counts.columns = ['Keyword', 'Count']
-                st.dataframe(keyword_counts)
+                st.dataframe(keyword_counts, hide_index = True)
     else:
         st.warning("No keywords found in the product names for the selected filters.")
 

@@ -52,29 +52,35 @@ def extract_num(text, pattern):
 def extract_features(row):
     features = {}
     text = row['full_text']
+
     features['brand'] = row['product_name'].split(' ')[0].lower()
     features['length_m'] = extract_num(text, r'(\d+)(\.\d+)?\s*m')
     features['length_cm'] = extract_num(text, r'(\d+)(\.\d+)?\s*cm')
     features['length_ft'] = extract_num(text, r'(\d+)(\.\d+)?\s*ft')
+
     if features['length_cm']: features['length_m'] = features['length_cm'] / 100
     if features['length_ft']: features['length_m'] = features['length_ft'] * 0.3048
+
     features['watts'] = extract_num(text, r'(\d+)(\.\d+)?\s*w')
     features['type_c'] = ('type-c' in text) or ('type c' in text) or ('usb-c' in text) or ('usb c' in text)
     features['micro_usb'] = int('micro usb' in text)
     features['lightning'] = int('lightning' in text)
     features['usb_a'] = int('usb-a' in text) or ('usb a' in text)
+
     fast_keywords = ['fast charging','fast charge','quick charge','qc 3.0','power delivery','pd','rapid charge']
     features['fast_charge']= int(any(kw in text for kw in fast_keywords))
     features['braided'] = int('braided' in text)
     features['nylon'] = int('nylon' in text)
     features['metal'] = int('metal' in text)
     features['tangle_free'] = int('tangle' in text)
+
     colors = ['black','white','red','blue',"green","yellow","silver","gold","grey","pink","purple"]
     for c in colors:
         features[f'color_{c}'] = int(c in text)
     device = ['iphone','ipad','android','samsung','vivo','oppo','oneplus']
     for d in device:
         features[f'supports_{d}'] = int(d in text)
+
     features['pack_counts'] = extract_num(text, r'pack of (\d+)')
     durability_kw = ['durable','heat-resistant','heavy-duty','premium','strong','reinforced']
     features['durability'] = int(any(kw in text for kw in durability_kw))
@@ -88,7 +94,7 @@ def extract_features(row):
     numeric_cols_for_scaling = ["watts","typec", "fast_charge", "braided","color_black","color_white","color_red","color_blue","color_green",]
     feature_data = pd.DataFrame(data['features'].tolist())
 
-    for col numeric_cols_for_scaling:
+    for col in numeric_cols_for_scaling:
         if col not in feature_data.columns:
             feature_data[col] = np.nan
     data = pd.concat([data, feature_data], axis=1)
@@ -98,7 +104,7 @@ def extract_features(row):
     return data, numeric_cols_for_scaling
 
 @st.cache_resource 
-def build_similarity_matrix(_data, _numeric_features)
+def build_similarity_matrix(_data, _numeric_features):
     tfidf = tfidfVectorizer(stop_words='english', max_features=5000)
     text_matrix = tfidf.fit_transform(_data["full_text"])
     text_sim_matrix = cosine_similarity(text_matrix)
@@ -108,12 +114,12 @@ def build_similarity_matrix(_data, _numeric_features)
     numeric_sim_matrix = cosine_similarity(numeric_scaled)
     return text_sim_matrix, numeric_sim_matrix 
 
-def get_similarity_score(idx1, idx2, text_sim, num_sim, data)
+def get_similarity_score(idx1, idx2, text_sim, num_sim, data):
     text_score = text_sim[idx1, idx2]
     cat_boost = 1.2 if data.loc[idx1, "main_category"] == data.loc[idx2,"main_category"] else 1.0
     return (0.6 * text_score + 0.4 * num_score) * cat_boost
 
-def recommend_products(data, product_name, text_sim, num_sim, top_n = 5)
+def recommend_products(data, product_name, text_sim, num_sim, top_n = 5):
     if product_name not in data["product_name"].values:
         return None
 

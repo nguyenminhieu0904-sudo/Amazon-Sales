@@ -98,7 +98,7 @@ def customer_review_insight_page():
     st.header('How do Ratings Correlate with Popularity?')
     st.markdown("This chart investigates wheher a higher rating corresponds to a higher number of reviews. (rating_count)")
 
-    col_graph1, col_data_1 = st.columns(2)
+    col_graph1, col_data_1 = st.columns([2,1])
     with col_graph1:
         fig_price_corr = px.scatter(
             filtered_data, x = 'rating', y = 'rating_count', color = 'main_category', 
@@ -128,7 +128,7 @@ def customer_review_insight_page():
             text = ' '.join(all_keywords)
             wordcloud = WordCloud(width=800, height=400, background_color='white',colormap = 'viridis', max_words=100).generate(text)
 
-            col_graph2, col_data_2 = st.columns(2)
+            col_graph2, col_data_2 = st.columns([3,1])
             with col_graph2:
                 fix, ax = plt.subplots(figsize=(12, 6))
                 ax.imshow(wordcloud, interpolation='bilinear')
@@ -138,7 +138,7 @@ def customer_review_insight_page():
                 st.markdown("### Common Keywords in Customer Reviews")
                 keyword_counts = pd.Series(all_keywords).value_counts().head(10).reset_index()
                 keyword_counts.columns = ['Keyword', 'Count']
-                st.dataframe(keyword_counts)
+                st.dataframe(keyword_counts, hide_index = True)
             st.markdown("The word cloud above visualizes the most common keywords found in customer reviews, excluding common stopwords. This can help identify trends and popular features in product offerings.")
         else:
             st.warning("No keywords found in the customer reviews for the selected filters.")
