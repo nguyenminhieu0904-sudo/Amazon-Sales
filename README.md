@@ -3,6 +3,7 @@
 An interactive data analytics project built with **Python, Pandas, Plotly, Scikit-learn, and Streamlit** to explore Amazon product listings, analyze pricing and customer reviews, and recommend similar products based on product attributes.
 
 🔗 **Live Demo: https://amazon-sales-analysee.streamlit.app/Price_and_Discount_Analysis
+
 💻 **GitHub Repository: https://github.com/nguyenminhieu0904-sudo/Amazon-Sales.git
 
 ## 1. Project Overview
